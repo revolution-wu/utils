@@ -1,0 +1,7 @@
+
+add_executable(EventLoop_unittest EventLoop_unittest.cpp)
+target_link_libraries(EventLoop_unittest network_shared)
+
+add_executable(EventLoop_unittest2 EventLoop_unittest2.cpp)
+target_link_libraries(EventLoop_unittest2 network_shared)
+
