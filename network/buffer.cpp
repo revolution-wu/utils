@@ -1,7 +1,9 @@
 #include "buffer.h"
 #include <sys/uio.h>
 
-using namespace base;
+using namespace net;
+const int Buffer::kCheapPrepend;
+const int Buffer::kInitalSize;
 size_t Buffer::readFd(int fd, int* err)
 {
   char buf[65536];

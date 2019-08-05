@@ -14,5 +14,7 @@ add_library(network_shared SHARED ${net_src})
 set_target_properties(network_static PROPERTIES OUTPUT_NAME "network")
 set_target_properties(network_shared PROPERTIES OUTPUT_NAME "netwrok")
 
+find_library(BOOSTTEST_LIBRARY NAMES boost_unit_test_framework)
+find_library(BOOSTSYSTERM_LIBRARY NAMES boost_systerm)
 add_subdirectory(test)
 

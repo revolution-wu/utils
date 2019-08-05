@@ -5,7 +5,7 @@
 #include <sys/types.h>
 #include <string>
 #include <algorithm>
-namespace base
+namespace net
 {
 class Buffer
 {
