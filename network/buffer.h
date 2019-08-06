@@ -83,10 +83,15 @@ class Buffer
   {
     ensureWritableBytes(len);
     std::copy(data, data + len, beginWriten());
-    if(len <= writeableBytes())
-    {
-      writenIndex_ += len;
-    }
+    //for(size_t i = 0; i < len; ++i)
+    //{
+    //  buffer_.push_back(data[i]);
+    //}
+
+   if(len <= writeableBytes())
+   {
+     writenIndex_ += len;
+   }
   }
 
   void append(const std::string& newString)
@@ -123,9 +128,19 @@ class Buffer
     return begin() + writenIndex_;
   }
 
-  const char* beginWriten() const
+  const char* beginWriten() const  
   {
     return begin() + writenIndex_;
+  }
+
+  size_t capacityBuf() const
+  {
+    return buffer_.capacity();
+  }
+  
+  size_t size() const
+  {
+    return buffer_.size();
   }
 
   size_t readFd(int fd, int* err);
@@ -134,16 +149,20 @@ class Buffer
   {
     if(writeableBytes() + prependableBytes() < len + kCheapPrepend)
     {
+      size_t readable = readableBytes();
       buffer_.resize(writenIndex_ + len);
       std::copy(begin() + readedIndex_, begin() + writenIndex_, begin() + kCheapPrepend);
       readedIndex_ = kCheapPrepend;
-      writenIndex_ = readableBytes() + readedIndex_;
+      writenIndex_ = readable + readedIndex_;
     }
     else
     {
+      size_t readable = readableBytes();
       std::copy(begin() + readedIndex_, begin() + writenIndex_, begin() + kCheapPrepend);
       readedIndex_ = kCheapPrepend;
-      writenIndex_ = readableBytes() + readedIndex_;
+
+      //writenIndex_ = readedIndex_ + readableBytes();
+      writenIndex_ = readable + readedIndex_;
     }
   }
   const char* begin() const
@@ -159,7 +178,6 @@ class Buffer
   std::vector<char> buffer_;
   size_t readedIndex_;
   size_t writenIndex_;
-  
 };
 }
 
