@@ -2,7 +2,8 @@ cmake_minimum_required(VERSION 2.8)
 project(network C CXX)
 set(net_src
   EventLoop.cpp
-  buffer.cpp)
+  buffer.cpp
+  Endian.h)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -std=c++0x -g -Wall -O0 -Wno-unused-variable -pthread") 
 set(CMAKE_CXX_COMPILER "g++")                                                                                                                          

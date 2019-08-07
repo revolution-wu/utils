@@ -100,3 +100,72 @@ BOOST_AUTO_TEST_CASE(testBufferInsideGrow)
   BOOST_CHECK_EQUAL(buf.writeableBytes(), buf.size() - (buf.readableBytes() + buf.prependableBytes()));
   BOOST_CHECK_EQUAL(buf.prependableBytes(), Buffer::kCheapPrepend);
 }
+
+BOOST_AUTO_TEST_CASE(testReadInt)
+{
+  Buffer buf;
+  buf.append("HTTP");
+
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 4);
+  BOOST_CHECK_EQUAL(buf.peekInt8(), 'H');
+  int top16 = buf.peekInt16();
+  printf("top16 = %d\n", top16);
+  BOOST_CHECK_EQUAL(top16, 'H'*256 + 'T');
+  BOOST_CHECK_EQUAL(buf.peekInt32(), top16*65536 + 'T'*256 + 'P');
+
+  BOOST_CHECK_EQUAL(buf.readInt8(), 'H');
+  BOOST_CHECK_EQUAL(buf.readInt16(), 'T'*256 + 'T');
+  BOOST_CHECK_EQUAL(buf.readInt8(), 'P');
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 0);
+  BOOST_CHECK_EQUAL(buf.writeableBytes(), 1024);
+
+  buf.appendInt8(-1);
+  buf.appendInt16(-2);
+  buf.appendInt32(-3);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 7);
+  BOOST_CHECK_EQUAL(buf.readInt8(), -1);
+  BOOST_CHECK_EQUAL(buf.readInt16(), -2);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 4);
+  BOOST_CHECK_EQUAL(buf.readInt32(), -3);
+  buf.appendInt32(1);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 4);
+  BOOST_CHECK_EQUAL(buf.readInt32(), 1);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 0);
+
+  // -1在内存中存储的是11111111  11111111  11111111 11111111
+  // 因此不存在大小端模式了，其他则不然
+  int x = -1;
+  buf.append(&x, sizeof(int));
+  BOOST_CHECK_EQUAL(buf.readInt8(), -1);
+  BOOST_CHECK_EQUAL(buf.readInt8(), -1);
+  BOOST_CHECK_EQUAL(buf.readInt16(), -1);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 0);
+
+  char y = 1;
+  buf.append(&y, sizeof(char));
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 1);
+  BOOST_CHECK_EQUAL(buf.readInt8(), 1);
+
+  short value = 1;
+  buf.append(&value, sizeof(short));
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 2);
+  BOOST_CHECK_EQUAL(buf.readNoConvertInt16(), 1);
+  int z = 1;
+  buf.append(&z, sizeof(z));
+  BOOST_CHECK_EQUAL(buf.readNoConvertInt32(), 1);
+}
+
+BOOST_AUTO_TEST_CASE(testBufferPrepend)
+{
+  Buffer buf;
+  buf.append(std::string(200, 'y'));
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 200);
+  BOOST_CHECK_EQUAL(buf.writeableBytes(), Buffer::kInitalSize-200);
+  BOOST_CHECK_EQUAL(buf.prependableBytes(), Buffer::kCheapPrepend);
+
+  int x = 0;
+  buf.prepend(&x, sizeof x);
+  BOOST_CHECK_EQUAL(buf.readableBytes(), 204);
+  BOOST_CHECK_EQUAL(buf.writeableBytes(), Buffer::kInitalSize-200);
+  BOOST_CHECK_EQUAL(buf.prependableBytes(), Buffer::kCheapPrepend - 4);
+}
