@@ -9,8 +9,9 @@
  **************************************************************************/
 #include "../Config.h"
 #include <iostream>
-
+#include <time.h>
 using namespace std;
+using namespace utils;
 int main(int argc, char *argv[])
 {
   Config conf("2.txt");
@@ -25,5 +26,10 @@ int main(int argc, char *argv[])
   conf.readConfig(&result);
   std::string value = conf.getValue("listen");
   cout << " vlaue " << value << endl;
+
+  time_t now = time(NULL);
+  printf("%lu\n", now);
+  time_t start = now / 86400 * 86400;
+  printf("%lu\n", start);
   return 0;
 }
