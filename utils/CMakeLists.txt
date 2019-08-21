@@ -21,7 +21,10 @@ set(utils_src
   FileUtils.cpp
   Config.cpp
   LogFile.cpp
-  Logging.cpp)
+  Logging.cpp
+  LogStream.cpp
+  AsyncLogging.cpp
+  Countdownlatch.cpp)
 
 add_library(utils ${utils_src})
 
