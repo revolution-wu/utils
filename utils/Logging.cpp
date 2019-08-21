@@ -41,6 +41,10 @@ bool Logging::outPut(LogLevel level,
   {
     basename_ = slash + 1;
   }
+  else
+  {
+    basename_ = filename;
+  }
 
   std::string strLine;
   makeLinePrefix(level,strLine);
